@@ -1,5 +1,8 @@
 {
     "geode": "4.10.2",
+    "gd": {
+        "win": "2.2074"
+    },
     "version": "v1.0.0",
     "id": "gd_ai_bot.autopilot",
     "name": "GD AI Autopilot",
