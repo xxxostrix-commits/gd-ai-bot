@@ -1,0 +1,62 @@
+name: Build Geode Mod
+
+on:
+  push:
+    branches: ["**"]
+    paths-ignore:
+      - "ai-brain/**"
+      - "README.md"
+      - "docs/**"
+  pull_request:
+    branches: ["**"]
+  workflow_dispatch:
+    inputs:
+      sdk:
+        description: "Geode SDK version/tag to build against (v4.x = GD 2.2074)"
+        required: false
+        default: "v4.10.2"
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  build:
+    name: Windows (.geode)
+    runs-on: windows-latest
+    # geode-sdk/build-geode-mod takes care of the Windows toolchain (clang + MSVC + Ninja).
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          submodules: recursive
+
+      - name: Build Geode mod (Windows)
+        id: build
+        uses: geode-sdk/build-geode-mod@main
+        with:
+          # v4.x SDK line targets GD 2.2074 (v5+ targets 2.2081).
+          sdk: ${{ github.event.inputs.sdk || 'v4.10.2' }}
+          target: Win64
+          build-config: Release
+          path: ./
+
+      - name: Upload .geode artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: gd-ai-bot-windows
+          path: ${{ steps.build.outputs.build-output }}
+          if-no-files-found: error
+          retention-days: 30
+
+      - name: Summary
+        shell: bash
+        run: |
+          {
+            echo "### Geometry Dash AI bot build"
+            echo ""
+            echo "Built artifact: \`${{ steps.build.outputs.build-output }}\`"
+            echo ""
+            echo "Install: copy the produced \`.geode\` file into \`Geometry Dash/geode/mods\`."
+            echo "Then run \`python ai-brain/bot.py\` and enter a level (F6 = bot on/off)."
+          } >> "$GITHUB_STEP_SUMMARY"

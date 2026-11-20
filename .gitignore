@@ -1,0 +1,29 @@
+# --- Python (ai-brain) ------------------------------------------------------
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+.pytest_cache/
+
+# --- CMake / Geode build output --------------------------------------------
+build/
+out/
+cmake-build-*/
+*.geode
+*.dll
+*.lib
+*.pdb
+*.ilk
+*.exp
+*.obj
+
+# --- Local scratch data (reference dumps, debug logs, one-off probes) ------
+# _ref/ holds a personal copy of the Geode SDK sources/archives (~140 MB).
+_ref/
+_*.txt
+_check_cpp.py
+
+# --- OS junk ---------------------------------------------------------------
+.DS_Store
+Thumbs.db
+desktop.ini

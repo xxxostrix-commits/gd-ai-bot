@@ -1,0 +1,32 @@
+{
+    "geode": "4.10.2",
+    "version": "v1.0.0",
+    "id": "gd_ai_bot.autopilot",
+    "name": "GD AI Autopilot",
+    "developer": "gd-ai-bot",
+    "description": "Autonomous Geometry Dash bot: a Geode C++ bridge streams level state over UDP to a Python physics simulator / beam-search brain and draws a configurable trajectory overlay.",
+    "repository": "https://github.com/xxxostrix-commits/gd-ai-bot",
+    "settings": {
+        "bot-enabled": {
+            "type": "bool",
+            "name": "Bot enabled",
+            "description": "Master switch for the AI autopilot. Can also be toggled in-game with F6.",
+            "default": true
+        },
+        "visual-preset": {
+            "type": "string",
+            "name": "Visual preset",
+            "description": "Overlay style. off = completely invisible (vanilla gameplay, minimal network usage), minimal = trajectory line only, showcase = neon paths + corridor + mini HUD, debug = full X-ray with hitboxes and extended telemetry. Cycle in-game with F7.",
+            "default": "showcase",
+            "one-of": ["off", "minimal", "showcase", "debug"]
+        },
+        "udp-port": {
+            "type": "int",
+            "name": "UDP port",
+            "description": "Local port used to talk to ai-brain/bot.py. Must match the 'port' value in ai-brain/config.json.",
+            "default": 12345,
+            "min": 1024,
+            "max": 65535
+        }
+    }
+}

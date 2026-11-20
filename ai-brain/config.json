@@ -1,0 +1,110 @@
+{
+    "_readme": [
+        "AI brain configuration. This file is hot-reloaded by bot.py once per second -- no restart needed.",
+        "All distances are Geometry Dash world units (1 block = 30 units), all velocities are units/second,",
+        "all accelerations are units/second^2. The physics block is expressed per-second on purpose so",
+        "the 240 Hz simulation in bot.py is framerate independent. Where it helps, the 60 fps equivalent",
+        "is written in _doc fields (multiply per-frame velocity by 60, per-frame gravity by 3600).",
+        "Keys starting with '_' are documentation only and are ignored by the bot."
+    ],
+
+    "network": {
+        "host": "127.0.0.1",
+        "port": 12345,
+        "socket_buffer": 16384,
+        "plan_interval_ms": 20.0,
+        "_doc": "The C++ bridge sends a state packet every processCommands tick and replies are sent back to the sender address. plan_interval_ms is how often the beam search is allowed to run; between plans the previous plan is reused (anti-spam + low CPU). The mod setting 'udp-port' must match port."
+    },
+
+    "visuals": {
+        "show_alt_paths": true,
+        "show_corridor": true,
+        "trajectory_step": 4,
+        "corridor_step_ticks": 8,
+        "send_risk": true,
+        "max_alt_paths": 2,
+        "_doc": "trajectory_step sends every Nth simulation point (4 keeps lines smooth while keeping packets small). send_risk adds a compact 0..100 danger value per path point so the C++ overlay can fade the neon line to yellow/red near obstacles. show_alt_paths/show_corridor only add data for the 'showcase'/'debug' presets."
+    },
+
+    "profiles": {
+        "active": "smooth",
+        "_doc": "The C++ bridge overrides 'active' with the profile selected by F8 (style_profile in the packet). 'smooth' plays like a human, 'tryhard' is for tight demons.",
+
+        "smooth": {
+            "max_cps": 10,
+            "min_switch_ticks": 14,
+            "click_penalty": 18.0,
+            "hysteresis_bonus": 25.0,
+            "safe_corridor_deadzone": 22.0,
+            "macro_step_ticks": 8,
+            "vertical_penalty": 0.08,
+            "smoothness_weight": 0.4,
+            "_doc": "max_cps: hard cap on real button switches per second. min_switch_ticks: minimum hold/release duration (240 Hz ticks) unless the current hold dies within solver.emergency_horizon_ticks. click_penalty: score cost of every hold change inside the search. hysteresis_bonus: score bonus for the still-valid previous plan. safe_corridor_deadzone: width of the central corridor band where centering corrections earn nothing (kills wave/ship 'sawtooth'). macro_step_ticks: branching period."
+        },
+
+        "tryhard": {
+            "max_cps": 22,
+            "min_switch_ticks": 5,
+            "click_penalty": 4.0,
+            "hysteresis_bonus": 8.0,
+            "safe_corridor_deadzone": 8.0,
+            "macro_step_ticks": 4,
+            "vertical_penalty": 0.02,
+            "smoothness_weight": 0.15,
+            "_doc": "Same fields as 'smooth' but tuned for precise wave/spam sections and very narrow corridors."
+        }
+    },
+
+    "solver": {
+        "lookahead_ticks": 96,
+        "beam_width": 14,
+        "adaptive_tight_threshold": 55.0,
+        "emergency_horizon_ticks": 18,
+        "time_budget_ms": 6.0,
+        "clearance_alert": 45.0,
+        "risk_scale": 60.0,
+        "death_penalty": 1000.0,
+        "progress_weight": 0.05,
+        "hazard_margin": 4.0,
+        "_doc": "lookahead_ticks: horizon length (96 ticks = 0.4 s at 240 Hz; more at 2x-4x speed in world units). beam_width: surviving branches per macro step. adaptive_tight_threshold: corridor height (units) below which click_penalty is scaled down smoothly so razor-thin spam corridors stay passable. emergency_horizon_ticks: if keeping the current button state dies within this many ticks, min_switch_ticks/max_cps are ignored. time_budget_ms: soft CPU budget per plan (the search degrades gracefully when exceeded)."
+    },
+
+    "physics": {
+        "tick_rate": 240,
+        "base_speed": 311.58,
+        "speed_multipliers": {
+            "0.5": 0.5,
+            "1": 1.0,
+            "2": 2.0,
+            "3": 3.0,
+            "4": 4.0
+        },
+        "_speed_doc": "base_speed is the 1x horizontal speed in GD units/second. Speed portals received as type codes 10..14 select the matching multiplier. If the measured horizontal speed (EMA over packets) is available the bot prefers it, so a slightly wrong base_speed does no harm.",
+
+        "gravity": 3153.6,
+        "jump_velocity": 670.8,
+        "max_fall_speed": 1500.0,
+        "ufo_jump_velocity": 620.0,
+        "ball_gravity": 3153.6,
+        "ball_flip_velocity": 480.0,
+        "robot_gravity": 3153.6,
+        "robot_jump_min": 380.0,
+        "robot_jump_max": 700.0,
+        "robot_charge_rate": 1500.0,
+        "spider_gravity": 3153.6,
+        "spider_teleport_range": 260.0,
+
+        "ship_gravity": 1150.0,
+        "ship_thrust": 1700.0,
+        "ship_max_vy": 480.0,
+
+        "wave_angle_deg": 45.0,
+
+        "player_hitbox": 30.0,
+        "hazard_hitbox": 22.0,
+        "ground_y": 0.0,
+        "out_of_bounds": 2600.0,
+
+        "_doc": "Cube defaults match the classic GD values (jump = 11.180032 u/frame * 60, gravity = 0.876 u/frame^2 * 3600). Ship/wave/ball/robot/spider values are approximations meant to be calibrated in-game with the overlay on: tweak a number, watch the predicted line, save, repeat (config hot-reloads in ~1 s). player_hitbox is the lethal solid hitbox, hazard_hitbox the smaller spike hitbox GD actually uses."
+    }
+}
