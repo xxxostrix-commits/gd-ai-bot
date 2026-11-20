@@ -31,5 +31,5 @@ setup_geode_mod(${PROJECT_NAME})
 # so it is linked guardedly (MinGW also accepts it) and listed explicitly in
 # the mod.json binaries as well.
 if(CMAKE_SYSTEM_NAME STREQUAL "Windows" OR WIN32 OR MINGW)
-    target_link_libraries(${PROJECT_NAME} PRIVATE ws2_32)
+    target_link_libraries(${PROJECT_NAME} ws2_32)
 endif()
